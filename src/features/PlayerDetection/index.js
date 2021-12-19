@@ -1,6 +1,8 @@
+import React from "react";
 import { connect } from "react-redux";
-import { setDetections, onLoadDetector } from "./actionCreator";
+import * as actions from "./actionCreator";
 
+import "../../assets/object_detetion.css";
 import Component from "./component";
 
 export const mapStateToProps = (state) => {
@@ -8,8 +10,7 @@ export const mapStateToProps = (state) => {
 };
 
 export const mapDispatchToProps = (dispatch) => ({
-  setDetections: (list) => dispatch(setDetections(list)),
-  onLoadDetector: () => dispatch(onLoadDetector()),
+  onLoadDetector: () => dispatch(actions.onLoadDetector())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Component);

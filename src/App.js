@@ -13,7 +13,7 @@ class App extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <PlayerDetection videoSource={videoStream} />
+        <PlayerDetection url={videoStream} dataDraw={[]} />
       </React.Fragment>
     );
   }

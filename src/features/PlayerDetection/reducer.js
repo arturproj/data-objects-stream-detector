@@ -2,8 +2,9 @@ import * as actions from "./actionCreator";
 
 const initialState = {
   loading: null,
-  recDetections: [],
-  allDetections: [],
+  allPredictions: [],
+  actorsPredictions: [],
+  actorsDetected: [],
 };
 
 const reducer = (state = initialState, action) => {
@@ -16,23 +17,34 @@ const reducer = (state = initialState, action) => {
     /**
      *
      */
-    case actions.LOAD_DETECTION:
-      let recDetections = state.recDetections.push(playload);
+    case actions.SET_ACTOR_PREDICTION:
+      let { actorsPredictions } = state;
 
+      if (
+        actorsPredictions.filter(
+          (itemInArray) => itemInArray.id === action.playload.id
+        ).length === 0
+      ) {
+        actorsPredictions.push(action.playload);
+      } else {
+        console.log("ready exist");
+      }
       return {
         ...state,
         loading: false,
-        recDetections,
+        actorsPredictions,
       };
     /**
      *
      */
-    case actions.SET_DETECTIONS:
-      return {
-        ...state,
-        loading: false,
-        allDetections: action.playload,
-      };
+    case actions.LOAD_PREDICTIONS:
+      const { allPredictions } = state;
+      state.actorsPredictions.map((actor) =>
+        actor.DATA.map((prediction) => allPredictions.push(prediction))
+      );
+
+      allPredictions.sort((a, b) => a.time < b.time);
+      return { ...state, allPredictions, loading: false };
     /**
      *
      */
