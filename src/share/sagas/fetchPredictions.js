@@ -1,5 +1,6 @@
 import { put, takeLatest, all, call } from "redux-saga/effects";
 import * as actionsDetector from "../../features/PlayerDetection/actionCreator";
+import { data } from "../detections-db.json";
 import Person from "./objectTypes/Person";
 
 export const detectionCreator = (stage) => {
@@ -14,9 +15,11 @@ export const detectionCreator = (stage) => {
 };
 export function* fetchPredictions() {
   try {
-    const json = yield fetch("http://localhost:3000/data").then((response) =>
-      response.json()
-    );
+    const json = data
+      ? data
+      : yield fetch("http://localhost:3000/data").then((response) =>
+          response.json()
+        );
 
     yield all(
       json.analysis.objects.map((actor) =>

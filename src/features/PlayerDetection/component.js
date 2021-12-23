@@ -1,7 +1,7 @@
 import * as React from "react";
 import ReactPlayer from "react-player";
 import PropTypes from "prop-types";
-
+import ActorPrediction from "./ActorPrediction";
 import videoStream from "../../assets/porshe.mp4";
 
 class PlayerComponent extends React.Component {
@@ -20,9 +20,66 @@ class PlayerComponent extends React.Component {
     loop: false,
     width: 0,
     height: 0,
+    playedSeconds: 0,
+    loadedSeconds: 0,
   };
 
-  canvas = React.createRef();
+  render() {
+    // console.log(this.props, this.state);
+    const { _H, _W, _asseX, _asseY, videoSource } = this.props;
+
+    return (
+      <React.Fragment>
+        <ReactPlayer
+          id="player-box"
+          controls
+          playing
+          width="100%"
+          height="auto"
+          url={videoSource}
+          ref={this.ref}
+          style={{
+            width: "1280",
+            height: "720",
+            position: "absolute",
+            zIndex: 1,
+          }}
+          progressInterval={0.001}
+          onPlay={this.handlePlay}
+          onEnablePIP={this.handleEnablePIP}
+          onDisablePIP={this.handleDisablePIP}
+          onPause={this.handlePause}
+          onEnded={this.handleEnded}
+          onProgress={this.handleProgress}
+          onDuration={this.handleDuration}
+          // onReady={() => console.log("onReady")}
+          // onStart={() => console.log("onStart")}
+          // onError={(e) =>  console.log("onError", e)}
+          // onBuffer={() => console.log("onBuffer")}
+          onSeek={(e) => console.log("onSeek", e)}
+        />
+        {this.props.dataDraw.map((CLASS_OBJECT, idx) => (
+          <ActorPrediction
+            key={idx}
+            actor={CLASS_OBJECT}
+            loaded={this.state.loaded}
+            played={this.state.played}
+            playedSeconds={this.state.playedSeconds}
+            loadedSeconds={this.state.loadedSeconds}
+            duration={this.state.duration}
+          />
+        ))}
+      </React.Fragment>
+    );
+  }
+
+  componentDidMount() {
+    this.props.onLoadDetector();
+    window.addEventListener("resize", this.updateDimensions);
+  }
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.updateDimensions);
+  }
 
   load = (url) => {
     this.setState({
@@ -34,7 +91,11 @@ class PlayerComponent extends React.Component {
   };
 
   handlePlayPause = () => {
-    this.setState({ playing: !this.state.playing });
+    if (!this.state.playing) {
+      this.setState({ playing: !this.state.playing });
+    } else {
+      this.setState({ playing: !this.state.playing });
+    }
   };
 
   handleStop = () => {
@@ -81,22 +142,22 @@ class PlayerComponent extends React.Component {
   };
 
   handlePlay = () => {
-    console.log("onPlay");
+    // console.log("onPlay");
     this.setState({ playing: true });
   };
 
   handleEnablePIP = () => {
-    console.log("onEnablePIP");
+    // console.log("onEnablePIP");
     this.setState({ pip: true });
   };
 
   handleDisablePIP = () => {
-    console.log("onDisablePIP");
+    // console.log("onDisablePIP");
     this.setState({ pip: false });
   };
 
   handlePause = () => {
-    console.log("onPause");
+    // console.log("onPause");
     this.setState({ playing: false });
   };
 
@@ -114,7 +175,7 @@ class PlayerComponent extends React.Component {
   };
 
   handleProgress = (state) => {
-    console.log("onProgress", state);
+    // console.log("onProgress", state);
     // We only want to update time slider if we are not currently seeking
     if (!this.state.seeking) {
       this.setState(state);
@@ -122,12 +183,12 @@ class PlayerComponent extends React.Component {
   };
 
   handleEnded = () => {
-    console.log("onEnded");
+    // console.log("onEnded");
     this.setState({ playing: this.state.loop });
   };
 
   handleDuration = (duration) => {
-    console.log("onDuration", duration);
+    // console.log("onDuration", duration);
     this.setState({ duration });
   };
 
@@ -149,66 +210,8 @@ class PlayerComponent extends React.Component {
       height: document.querySelector("#player-box").clientHeight,
     });
   };
-  componentDidMount() {
-    this.props.onLoadDetector();
-    window.addEventListener("resize", this.updateDimensions);
-  }
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.updateDimensions);
-  }
-  render() {
-    console.log(this.props, this.state);
-    const { _H, _W, _asseX, _asseY, videoSource } = this.props;
-
-    const showDetection = _H && _W && _asseX && _asseY;
-
-    return (
-      <React.Fragment>
-        <ReactPlayer
-          id="player-box"
-          controls
-          playing
-          width="100%"
-          height="auto"
-          url={videoSource}
-          ref={this.canvas}
-          style={{
-            width: "1280",
-            height: "720",
-            position: "absolute",
-            zIndex: 1,
-          }}
-          progressInterval={0.0001}
-          onReady={() => console.log("onReady")}
-          onStart={() => console.log("onStart")}
-          onPlay={this.handlePlay}
-          onEnablePIP={this.handleEnablePIP}
-          onDisablePIP={this.handleDisablePIP}
-          onPause={this.handlePause}
-          onBuffer={() => console.log("onBuffer")}
-          onPlaybackRateChange={this.handleOnPlaybackRateChange}
-          onSeek={(e) => console.log("onSeek", e)}
-          onEnded={this.handleEnded}
-          onError={(e) => console.log("onError", e)}
-          onProgress={this.handleProgress}
-          onDuration={this.handleDuration}
-        />
-        <canvas
-          style={{
-            zIndex: 9999,
-            position: "absolute",
-            border: "solid",
-            borderColor: "blue",
-            borderRadius: 12,
-            height: _H,
-            width: _W,
-            transform: `translate(${_asseX}px,${_asseY}px)`,
-          }}
-          hidden={!showDetection}
-        ></canvas>
-      </React.Fragment>
-    );
-  }
+  getPrediction = (props) => props.allPredictions;
+  getActors = (props) => props.allPredictions;
 }
 
 PlayerComponent.propTypes = {
